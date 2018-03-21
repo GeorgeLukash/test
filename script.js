@@ -1,8 +1,12 @@
-var promos_array = ['phillyd','sleepwithme','atp100','PRESENTABLE'];
+var promos_array = ['facebook','phillyd','sleepwithme','atp100','PRESENTABLE'];
 var result_array = [];
 
-Promise.each = async function(arr, fn) { 
-   for(let item of arr) await fn(item);
+Promise.each = function(arr, fn) {   
+  if(!Array.isArray(arr)) return Promise.reject(new Error("Non array passed to each"));  
+  if(arr.length === 0) return Promise.resolve(); 
+  return arr.reduce(function(prev, cur) { 
+    return prev.then(() => fn(cur))
+  }, Promise.resolve());
 }
 
 var _removePromoCode = async ()=>{
@@ -21,8 +25,7 @@ var _removePromoCode = async ()=>{
     });
 }
 
-
-var _applyPromoCode = async (promo_code) => {
+var _applyPromoCode = (promo_code)=>{
     _removePromoCode();
     const url = new URL('https://casper.com/japi/order/apply_promo');
     const params = {
@@ -31,14 +34,18 @@ var _applyPromoCode = async (promo_code) => {
     };
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
-    await fetch(url, {
+    return fetch(url, {
         header: {
             'accept': 'application/json; version=1',
             'accept-encoding': 'gzip, deflate, br'
         },
         credentials: 'include',
         method: 'POST'
-    }).then((response) => {
+    })
+};
+
+var _findPromoCodes = async (promo_code) => {
+    await _applyPromoCode(promo_code).then((response) => {
         return response.json();
     }).then((data) => {
           let promo = {};
@@ -49,45 +56,21 @@ var _applyPromoCode = async (promo_code) => {
            });
            promo.code = promo_code;
            promo.discount = total.attributes.order; 
-           result_array.push(promo);                   
+           result_array.push(promo); 
+           console.log(promo);                  
      });
 }
 
-var _bestCodeApply = (promo_code) => {
-    _removePromoCode();
-    const url = new URL('https://casper.com/japi/order/apply_promo');
-    const params = {
-        include: 'line_items.variant',        
-        coupon_code: promo_code       
-    };
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-     fetch(url, {
-        header: {
-            'accept': 'application/json; version=1',
-            'accept-encoding': 'gzip, deflate, br'
-        },
-        credentials: 'include',
-        method: 'POST'
-    }).then((response) => {
-        return response.json();
-    }).then((data) => {         
-          let total = data.included.find((item) => {
-              if (item.type === 'totals') {
-                   return item;                    
-               }
-           });           
-           console.log('Best promo is : ',promo_code,'total is : ', total.attributes.order);                               
-     });;
-};
-
 var _someFunction = async ()=>{
-    await Promise.each(promos_array, _applyPromoCode);
+    await Promise.each(promos_array, _findPromoCodes);
+    console.log(result_array);
     result_array.sort((a,b)=>{
         return a.discount - b.discount;
     });
+        
 
-    _bestCodeApply(result_array[0].code);
+    _applyPromoCode(result_array[0].code);
+    location.reload();
     
 }
 
