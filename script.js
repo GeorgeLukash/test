@@ -1,4 +1,4 @@
-var promos_array = ['facebook','phillyd','sleepwithme','atp100','PRESENTABLE'];
+var promos_array = ['SUNY50','facebook','phillyd','PRESENTABLE','sleepwithme','atp100'];
 var result_array = [];
 
 Promise.each = function(arr, fn) {   
@@ -23,6 +23,18 @@ var _removePromoCode = async ()=>{
         credentials: 'include',
         method: 'POST'
     });
+}
+
+var _checkForPromos = ()=>{
+  const parent_elem = document.querySelector('.CartSummary__item-label--promo___3Ag_n');  
+  if(parent_elem != null){
+    let promo_set = new Set(promos_array);
+    let tmp_code = parent_elem.textContent;    
+    promo_set.add(tmp_code.replace(/\s/g,'').toLowerCase());
+    promos_array = [...promo_set];   
+  }else{
+    console.log('No promo code on page!');
+  }  
 }
 
 var _applyPromoCode = (promo_code)=>{
@@ -61,17 +73,18 @@ var _findPromoCodes = async (promo_code) => {
      });
 }
 
-var _someFunction = async ()=>{
+var _mainFunction = async ()=>{
+    await _checkForPromos();
     await Promise.each(promos_array, _findPromoCodes);
-    console.log(result_array);
+   
     result_array.sort((a,b)=>{
         return a.discount - b.discount;
     });
-        
+    console.log(result_array);
 
     _applyPromoCode(result_array[0].code);
-    location.reload();
+     location.reload();
     
 }
 
-_someFunction();
+_mainFunction();
