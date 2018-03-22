@@ -9,13 +9,13 @@ Promise.each = function(arr, fn) {
   }, Promise.resolve());
 }
 
-var _removePromoCode = async ()=>{
+var _removePromoCode = ()=>{
     const url = new URL('https://casper.com/japi/order/remove_promos');
     const params ={
         include: 'line_items.variant'
     };
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    await fetch(url,{
+    fetch(url,{
          header: {
             'accept': 'application/json; version=1',
             'accept-encoding': 'gzip, deflate, br'
@@ -31,7 +31,8 @@ var _checkForPromos = ()=>{
     let promo_set = new Set(promos_array);
     let tmp_code = parent_elem.textContent;    
     promo_set.add(tmp_code.replace(/\s/g,'').toLowerCase());
-    promos_array = [...promo_set];   
+    promos_array = [...promo_set];
+    _removePromoCode();
   }else{
     console.log('No promo code on page!');
   }  
@@ -84,8 +85,8 @@ var _mainFunction = async ()=>{
     });
     console.log(result_array);
 
-    _applyPromoCode(result_array[0].code);
-     location.reload();
+    await _applyPromoCode(result_array[0].code);
+    location.reload();
     
 }
 
