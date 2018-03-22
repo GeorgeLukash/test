@@ -31,8 +31,7 @@ var _checkForPromos = ()=>{
     let promo_set = new Set(promos_array);
     let tmp_code = parent_elem.textContent;    
     promo_set.add(tmp_code.replace(/\s/g,'').toLowerCase());
-    promos_array = [...promo_set];
-    _removePromoCode();
+    promos_array = [...promo_set];    
   }else{
     console.log('No promo code on page!');
   }  
@@ -77,7 +76,7 @@ var _findPromoCodes = async (promo_code) => {
 }
 
 var _mainFunction = async ()=>{
-    await _checkForPromos();
+    _checkForPromos();
     await Promise.each(promos_array, _findPromoCodes);
    
     result_array.sort((a,b)=>{
@@ -86,8 +85,7 @@ var _mainFunction = async ()=>{
     console.log(result_array);
 
     await _applyPromoCode(result_array[0].code);
-    location.reload();
-    
+    location.reload(); 
 }
 
 _mainFunction();
