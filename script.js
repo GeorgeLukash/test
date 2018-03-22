@@ -61,13 +61,15 @@ var _findPromoCodes = async (promo_code) => {
         return response.json();
     }).then((data) => {
           let promo = {};
-          let total = data.included.find((item) => {
+          let origin_price = 0;
+          let order_details = data.included.find((item) => {
               if (item.type === 'totals') {
                    return item;                    
                }
            });
+           origin_price = order_details.attributes.item;
            promo.code = promo_code;
-           promo.discount = total.attributes.order; 
+           promo.discount = origin_price - order_details.attributes.order; 
            result_array.push(promo); 
            console.log(promo);                  
      });
@@ -78,7 +80,7 @@ var _mainFunction = async ()=>{
     await Promise.each(promos_array, _findPromoCodes);
    
     result_array.sort((a,b)=>{
-        return a.discount - b.discount;
+        return b.discount - a.discount;
     });
     console.log(result_array);
 
