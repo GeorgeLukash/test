@@ -52,7 +52,7 @@ var _getExistCode = () => {
   const parent_elem = document.querySelector('input[name="redemption_code"]');    
   let extinct_promocode_flag = false;
 
-  if(parent_elem.value != ''){ 
+  if(parent_elem.value.length){ 
     let promo_set = new Set(promos_array);
     let tmp_code = parent_elem.value;  
     extinct_promocode_flag = true;      
@@ -64,16 +64,16 @@ var _getExistCode = () => {
   return Promise.resolve(extinct_promocode_flag);
 }
 
-var _parseTotal = (data) => {  
+function _parseTotal (data) {  
   const parrent_wrapper = document.querySelector('.Cart__Total');
   const regex = /(\d+(,\d{3})*(\.\d+)?)/g;
   let price = null;  
   if (data) {   
-      let total_proce_order = data.cart.display_line_items.find((item)=>{
+      const total_price_order = data.cart.display_line_items.find((item)=>{
           if(item.key == 'total')
             return item;
         });
-    price = total_proce_order.raw_value;    
+    price = total_price_order.raw_value;    
   } else {    
     price = Number(parrent_wrapper.textContent.match(regex)[1].replace(/,/g,''));      
   }
@@ -116,4 +116,4 @@ _getExistCode()
 .then(()=>{
   location.reload();
   return Promise.resolve();
-});;
+});
