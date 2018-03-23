@@ -1,3 +1,4 @@
+/*-----------1068-----------*/
 var promos_array = ['SLAINTE','JAN18','DOORBUSTER','DOORBUSTER','FEBPJ','OFFICEPARTY','LOVEBOOZE','KEPPWARM','STAYWARM','DRIZLYDEAL'];
 var result_array = [];
 
@@ -73,7 +74,7 @@ function _parseTotal (data) {
           if(item.key == 'total')
             return item;
         });
-    price = total_price_order.raw_value;    
+    price = total_price_order.raw_value;        
   } else {    
     price = Number(parrent_wrapper.textContent.match(regex)[1].replace(/,/g,''));      
   }
@@ -114,6 +115,6 @@ _getExistCode()
   return _applyPromoCode(result_array[0].code);
 })
 .then(()=>{
-  location.reload();
+  //location.reload();
   return Promise.resolve();
 });
