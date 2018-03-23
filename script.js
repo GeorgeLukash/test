@@ -1,5 +1,7 @@
 var promos_array = ['SUNY50','facebook','phillyd','PRESENTABLE','sleepwithme','atp100'];
 var result_array = [];
+var parent_elem = null;
+var parrent_wrapper = null;
 
 Promise.each = function(arr, fn) {   
   if(!Array.isArray(arr)) return Promise.reject(new Error("Non array passed to each"));  
@@ -9,13 +11,26 @@ Promise.each = function(arr, fn) {
   }, Promise.resolve());
 }
 
-var _getExistCode = () => {  
-  const parent_elem = document.querySelector('.CartSummary__item-label--promo___3Ag_n');  
-  let exictinkt_promocode_flag = false;
+var _checkURL = (url)=>{
+  if(url === 'https://casper.com/checkout/address'){
+      parent_elem = document.querySelector('.CartSummary__item-label--promo___1a_YK'); 
+      parrent_wrapper = document.querySelector('.CartSummary__item-value--total___1OaEv');
+  }else{
+      parent_elem = document.querySelector('.CartSummary__item-label--promo___3Ag_n');
+      parrent_wrapper = document.querySelector('.CartSummary__item-value--total___3nPuY');
+  }
+}
 
+var _getExistCode = () => {  
+  //const parent_elem = document.querySelector('.CartSummary__item-label--promo___3Ag_n');
+  //const parent_elem = document.querySelector('.CartSummary__item-label--promo___1a_YK'); 
+  const regex = />(.+?)</;;
+  _checkURL(document.URL);
+  let exictinkt_promocode_flag = false;
+  
   if(parent_elem != null){ 
     let promo_set = new Set(promos_array);
-    let tmp_code = parent_elem.textContent;  
+    let tmp_code = parent_elem.innerHTML.match(regex)[1];      
     exictinkt_promocode_flag = true;      
     promo_set.add(tmp_code.replace(/\s/g,'').toLowerCase());
     promos_array = [...promo_set];    
@@ -31,7 +46,7 @@ var _removePromoCode = () => {
     const postBody = new URLSearchParams();
     postBody.set('include', 'line_items.variant');
     return fetch(url,{
-         header: {
+         headers: {
             'accept': 'application/json; version=1',
             'accept-encoding': 'gzip, deflate, br'
         },
@@ -58,7 +73,8 @@ var _applyPromoCode = (promo_code) => {
 };
 
 function _parseTotal (data) {
-  const parrent_wrapper = document.querySelector('.CartSummary__item-value--total___3nPuY');
+  //const parrent_wrapper = document.querySelector('.CartSummary__item-value--total___3nPuY');
+  //const parrent_wrapper = document.querySelector('.CartSummary__item-value--total___1OaEv');
   const regex = /(\d+(,\d{3})*(\.\d+)?)/g;
   let price = null;  
   if (data) {
