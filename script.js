@@ -1,3 +1,4 @@
+/*-----------995-----------*/
 var promos_array = ['SUNY50','facebook','phillyd','PRESENTABLE','sleepwithme','atp100'];
 var result_array = [];
 var parent_elem = null;
@@ -21,9 +22,7 @@ var _checkURL = (url)=>{
   }
 }
 
-var _getExistCode = () => {  
-  //const parent_elem = document.querySelector('.CartSummary__item-label--promo___3Ag_n');
-  //const parent_elem = document.querySelector('.CartSummary__item-label--promo___1a_YK'); 
+var _getExistCode = () => {    
   const regex = />(.+?)</;;
   _checkURL(document.URL);
   let exictinkt_promocode_flag = false;
@@ -73,8 +72,6 @@ var _applyPromoCode = (promo_code) => {
 };
 
 function _parseTotal (data) {
-  //const parrent_wrapper = document.querySelector('.CartSummary__item-value--total___3nPuY');
-  //const parrent_wrapper = document.querySelector('.CartSummary__item-value--total___1OaEv');
   const regex = /(\d+(,\d{3})*(\.\d+)?)/g;
   let price = null;  
   if (data) {
