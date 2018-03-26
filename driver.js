@@ -1,9 +1,8 @@
-/*-----------1068-----------*/
 var promos_array = ['SLAINTE','JAN18','DOORBUSTER','DOORBUSTER','FEBPJ','OFFICEPARTY','LOVEBOOZE','KEPPWARM','STAYWARM','DRIZLYDEAL'];
 var result_array = [];
 
 var meta_token = document.querySelector('meta[name="csrf-token"]');
-var x_csrf_token = meta_token.getAttribute('content')
+var x_csrf_token = meta_token.getAttribute('content');
 
 Promise.each = function(arr, fn) {   
   if(!Array.isArray(arr)) return Promise.reject(new Error("Non array passed to each"));  
@@ -12,7 +11,6 @@ Promise.each = function(arr, fn) {
     return prev.then(() => fn(cur))
   }, Promise.resolve());
 }
-
 
 var _applyPromoCode = (promo_code) => {
     const url = 'https://drizly.com/cart';
@@ -49,6 +47,10 @@ var _removePromoCode = ()=>{
     .then((res) => res.json());             
 }
 
+var _getTotalAfterRemoveCode = ()=>{
+
+}
+
 var _getExistCode = () => {
   const parent_elem = document.querySelector('input[name="redemption_code"]');    
   let extinct_promocode_flag = false;
@@ -66,15 +68,20 @@ var _getExistCode = () => {
 }
 
 function _parseTotal (data) {  
-  const parrent_wrapper = document.querySelector('.Cart__Total');
-  const regex = /(\d+(,\d{3})*(\.\d+)?)/g;
+  const parrent_wrapper = document.querySelector('.Cart__Total');  
+  const regex = /(\d+(,\d+)*(\.\d+)?)/g;
   let price = null;  
-  if (data) {   
-      const total_price_order = data.cart.display_line_items.find((item)=>{
+  if (data) {  
+    const last_saved_driver_tip = Number(document.querySelector('#tip_amount').value);
+    const driver_tip = data.cart.display_line_items.find((item)=>{
+          if(item.key == 'driver_tip')
+            return item;
+        }); 
+    const total_price_order = data.cart.display_line_items.find((item)=>{
           if(item.key == 'total')
             return item;
         });
-    price = total_price_order.raw_value;        
+    price = total_price_order.raw_value - driver_tip.raw_value + last_saved_driver_tip;           
   } else {    
     price = Number(parrent_wrapper.textContent.match(regex)[1].replace(/,/g,''));      
   }
@@ -115,6 +122,6 @@ _getExistCode()
   return _applyPromoCode(result_array[0].code);
 })
 .then(()=>{
-  //location.reload();
+  location.reload();
   return Promise.resolve();
 });
