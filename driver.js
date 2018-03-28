@@ -4,6 +4,9 @@ var result_array = [];
 var meta_token = document.querySelector('meta[name="csrf-token"]');
 var x_csrf_token = meta_token.getAttribute('content');
 
+var promo_btn = document.querySelector('.apply-promo');
+var input_promo = document.querySelector("#redemption_input");
+
 Promise.each = function(arr, fn) {   
   if(!Array.isArray(arr)) return Promise.reject(new Error("Non array passed to each"));  
   if(arr.length === 0) return Promise.resolve(); 
@@ -47,10 +50,6 @@ var _removePromoCode = ()=>{
     .then((res) => res.json());             
 }
 
-var _getTotalAfterRemoveCode = ()=>{
-
-}
-
 var _getExistCode = () => {
   const parent_elem = document.querySelector('input[name="redemption_code"]');    
   let extinct_promocode_flag = false;
@@ -88,9 +87,16 @@ function _parseTotal (data) {
   return price;
 }
 
+_doEventInput = ( obj, eventt ) => {
+    let event = new Event( eventt, {target: obj, bubbles: true} );
+    return obj ? obj.dispatchEvent(event) : false;
+}
+
 _getExistCode()
 .then(res =>{
-  if(res){     
+  if(res){  
+      document.querySelector('.apply-promo').click(); 
+      input_promo.value='';  
       return _removePromoCode()
           .then( data => { return _parseTotal(data)});
   }else{
@@ -117,11 +123,8 @@ _getExistCode()
   result_array.sort((a,b)=>{
         return b.discount - a.discount;
   });
- 
-  console.log(result_array);
-  return _applyPromoCode(result_array[0].code);
-})
-.then(()=>{
-  location.reload();
-  return Promise.resolve();
+  
+  input_promo.value = result_array[0].code.toString();
+  _doEventInput( input_promo, 'input' );
+  document.querySelector('.apply-promo').click();  
 });
